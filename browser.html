@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Browser</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #game-list { list-style: none; padding: 0; }
+        .game-item { margin: 10px 0; }
+        .pagination { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Game Browser</h1>
+    <input type="text" id="search" placeholder="Search games...">
+    <ul id="game-list"></ul>
+    <div class="pagination">
+        <button id="prev">Previous</button>
+        <button id="next">Next</button>
+        <span id="page-info"></span>
+    </div>
+
+    <script>
+        const games = []; // Replace this line with actual games data
+        const itemsPerPage = 10;
+        let currentPage = 1;
+
+        function displayGames(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedGames = games.slice(start, end);
+            const gameList = document.getElementById('game-list');
+            gameList.innerHTML = '';
+
+            paginatedGames.forEach(game => {
+                const li = document.createElement('li');
+                li.className = 'game-item';
+                li.textContent = game.name; // Adjust the property based on actual game data structure
+                gameList.appendChild(li);
+            });
+
+            document.getElementById('page-info').innerText = `Page ${currentPage} of ${Math.ceil(games.length / itemsPerPage)}`;
+        }
+
+        function setupPagination() {
+            document.getElementById('prev').disabled = currentPage === 1;
+            document.getElementById('next').disabled = currentPage === Math.ceil(games.length / itemsPerPage);
+        }
+
+        document.getElementById('prev').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayGames(currentPage);
+                setupPagination();
+            }
+        });
+
+        document.getElementById('next').addEventListener('click', () => {
+            if (currentPage < Math.ceil(games.length / itemsPerPage)) {
+                currentPage++;
+                displayGames(currentPage);
+                setupPagination();
+            }
+        });
+
+        document.getElementById('search').addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredGames = games.filter(game => game.name.toLowerCase().includes(searchTerm));
+            const totalPages = Math.ceil(filteredGames.length / itemsPerPage);
+            currentPage = 1;
+
+            displayFilteredGames(filteredGames);
+            setupPagination();
+        });
+
+        function displayFilteredGames(filteredGames) {
+            const gameList = document.getElementById('game-list');
+            gameList.innerHTML = '';
+
+            filteredGames.slice(0, itemsPerPage).forEach(game => {
+                const li = document.createElement('li');
+                li.className = 'game-item';
+                li.textContent = game.name; // Adjust the property based on actual game data structure
+                gameList.appendChild(li);
+            });
+
+            document.getElementById('page-info').innerText = `Showing ${filteredGames.length} results`;
+        }
+
+        // Example games data, replace with actual data
+        for (let i = 1; i <= 800; i++) {
+            games.push({ name: `Game ${i}` });
+        }
+
+        displayGames(currentPage);
+        setupPagination();
+    </script>
+</body>
+</html>
